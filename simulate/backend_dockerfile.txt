@@ -1,0 +1,54 @@
+# 使用提供的Python基础镜像
+FROM hb.eazytec-cloud.com/eazydevelop/python:3.12.3-slim-amd64
+
+# 清空原有源配置
+RUN rm -f /etc/apt/sources.list.d/*
+
+# 配置完整清华源
+RUN echo "deb http://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm main contrib non-free non-free-firmware\n\
+deb http://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm-updates main contrib non-free non-free-firmware\n\
+deb http://mirrors.tuna.tsinghua.edu.cn/debian-security bookworm-security main contrib non-free non-free-firmware" > /etc/apt/sources.list
+
+# 安装 Python 3.11 和虚拟环境支持
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    python3.11 \
+    python3.11-dev \
+    python3.11-venv \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# 创建并激活 Python 3.11 虚拟环境
+RUN python3.11 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# 安装编译工具链
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    build-essential \
+    libffi-dev \
+    libssl-dev \
+    libbz2-dev \
+    libncurses-dev \
+    libgdbm-dev \
+    liblzma-dev \
+    libsqlite3-dev \
+    zlib1g-dev \
+    libreadline-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# 设置工作目录
+WORKDIR /app
+
+# 安装Python依赖
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
+
+# 复制应用代码
+COPY . .
+
+# 环境变量与启动命令
+ENV APP_PORT_2=8000 HOST=0.0.0.0
+EXPOSE 8000
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

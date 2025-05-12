@@ -1,0 +1,1 @@
+"{\"id\":\"964d274ccbdb4d1f97157cb0c26304f3\",\"content\":\"\",\"instruct_content\":null,\"role\":\"Engineer\",\"cause_by\":\"metagpt.actions.summarize_code.SummarizeCode\",\"sent_from\":\"metagpt.roles.engineer.Engineer\",\"send_to\":[\"SysEdward\"]}"

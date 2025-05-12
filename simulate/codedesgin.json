@@ -1,0 +1,88 @@
+{
+    "Data structures and interfaces": "\nclassDiagram\n    class Task {\n        + int id\n        + string description\n        + bool completed\n        + datetime created_at\n        + __init__(id: int, description: string, completed: bool, created_at: datetime) -> None\n        + markAsCompleted() -> None\n        + deleteTask() -> None\n    }\n\n    class TaskRepository {\n        + addTask(description: string) -> Task\n        + updateTaskStatus(task_id: int, completed: bool) -> Task\n        + deleteTask(task_id: int) -> None\n        + getTasksByStatus(completed: bool) -> list[Task]\n    }\n\n    class TaskService {\n        - repository: TaskRepository\n        + createTask(description: string) -> Task\n        + completeTask(task_id: int) -> Task\n        + removeTask(task_id: int) -> None\n        + fetchTasks(status: string) -> list[Task]\n    }\n\n    class TaskController {\n        - service: TaskService\n        + addTask(description: string) -> Task\n        + completeTask(task_id: int) -> Task\n        + deleteTask(task_id: int) -> None\n        + getTasks(status: string) -> list[Task]\n    }\n\n    class TaskUI {\n        + displayTasks(tasks: list[Task]) -> void\n        + showSuccessMessage(message: string) -> void\n        + showErrorMessage(message: string) -> void\n    }\n\n    TaskUI --> TaskController : Trigger Actions\n    TaskController --> TaskService : Invoke Business Logic\n    TaskService --> TaskRepository : Access Data Layer\n",
+    "Program call flow": "\nsequenceDiagram\n    participant UI as TaskUI\n    participant Ctrl as TaskController\n    participant Svc as TaskService\n    participant Repo as TaskRepository\n    participant DB as Database\n\n    %% Adding a new task\n    UI->>Ctrl: addTask(description)\n    Ctrl->>Svc: createTask(description)\n    Svc->>Repo: addTask(description)\n    Repo->>DB: INSERT INTO tasks (description, completed, created_at) VALUES (...)\n    DB-->>Repo: Return new task record\n    Repo-->>Svc: Return created Task object\n    Svc-->>Ctrl: Return created Task object\n    Ctrl-->>UI: Display success message\n\n    %% Marking a task as completed\n    UI->>Ctrl: completeTask(task_id)\n    Ctrl->>Svc: completeTask(task_id)\n    Svc->>Repo: updateTaskStatus(task_id, True)\n    Repo->>DB: UPDATE tasks SET completed = True WHERE id = task_id\n    DB-->>Repo: Return updated task record\n    Repo-->>Svc: Return updated Task object\n    Svc-->>Ctrl: Return updated Task object\n    Ctrl-->>UI: Update UI to reflect completion\n\n    %% Deleting a task\n    UI->>Ctrl: deleteTask(task_id)\n    Ctrl->>Svc: removeTask(task_id)\n    Svc->>Repo: deleteTask(task_id)\n    Repo->>DB: DELETE FROM tasks WHERE id = task_id\n    DB-->>Repo: Confirm deletion\n    Repo-->>Svc: Confirm deletion\n    Svc-->>Ctrl: Confirm deletion\n    Ctrl-->>UI: Remove task from UI\n",
+    "Project File Structure": [
+        [
+            "requirements.txt",
+            "Lists all Python dependencies required for the project."
+        ],
+        [
+            "backend/database/connection.py",
+            "Handles database connection setup using SQLAlchemy's AsyncMy engine."
+        ],
+        [
+            "backend/database/models.py",
+            "Defines the Task model and its schema for ORM mapping."
+        ],
+        [
+            "backend/modules/tasks/api.py",
+            "Defines API endpoints related to task management (add, update, delete, fetch)."
+        ],
+        [
+            "backend/modules/tasks/services.py",
+            "Implements business logic for task operations."
+        ],
+        [
+            "backend/modules/tasks/repository.py",
+            "Manages interactions with the database layer for CRUD operations on tasks."
+        ],
+        [
+            "frontend/index.html",
+            "The main HTML file serving as the frontend entry point."
+        ],
+        [
+            "frontend/src/main.ts",
+            "The root TypeScript file initializing the Vue 3 app and configuring plugins."
+        ],
+        [
+            "frontend/src/App.vue",
+            "The root Vue component defining the application layout."
+        ],
+        [
+            "frontend/src/router/index.ts",
+            "Configures Vue Router for navigation between 'Home' and 'Completed Tasks' pages."
+        ],
+        [
+            "frontend/src/stores/taskStore.ts",
+            "Manages global state for tasks using Pinia."
+        ],
+        [
+            "frontend/src/views/HomeView.vue",
+            "Displays the home page with active tasks."
+        ],
+        [
+            "frontend/src/views/CompletedTasksView.vue",
+            "Displays the page listing completed tasks."
+        ],
+        [
+            "frontend/src/components/TaskCard.vue",
+            "Reusable component representing individual task cards."
+        ],
+        [
+            "frontend/package.json",
+            "Manages project metadata, dependencies, and scripts for installation, updates, and commands execution."
+        ],
+        [
+            "frontend/vite.config.ts",
+            "Customizes development and build processes, including server settings, module rules, and output configurations."
+        ],
+        [
+            "frontend/.eslintrc.cjs",
+            "Defines coding rules and style guidelines to detect errors and maintain code quality and consistency."
+        ],
+        [
+            "main.py",
+            "The main entry point of the backend application, responsible for initializing the application and starting the server."
+        ]
+    ],
+    "Project Settings": "\n## Backend Configuration\n- Programming Language: Python 3.10+\n- Web Framework: FastAPI\n- ORM: SQLAlchemy 2.0+\n- Database Migration: Alembic\n- Dependencies:\n  - aiohttp==3.8.6, alembic==1.13.1, anyio==3.7.1, asyncmy==0.2.9, fastapi==0.110.0, pydantic==2.11.2, SQLAlchemy==2.0.25, uvicorn==0.25.0, httpx==0.26.0, bcrypt==4.0.1, PyMySQL==1.1.0\n\n## Frontend Configuration\n- Framework: Vue 3 Composition API\n- Build Tool: Vite\n- UI Library: Element Plus\n- State Management: Pinia\n- Dependencies:\n  - axios@1.6.7, element-plus@2.5.6, pinia@2.1.7, vue@3.4.20, vue-router@4.3.0\n\n## File Structure\nSee generated structure above.",
+    "Database Setting": {
+        "engine": "mysql",
+        "host": "127.0.0.1",
+        "port": 3306,
+        "username": "root",
+        "password": "123456",
+        "database": "eazydevelop",
+        "url": "mysql+asyncmy://root:123456@127.0.0.1:3306/eazydevelop"
+    }
+}
